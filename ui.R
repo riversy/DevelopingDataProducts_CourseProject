@@ -1,9 +1,8 @@
 library(shiny)
-library(shinythemes)
 
 shinyUI(
   
-  fluidPage(theme = shinytheme("spacelab"),
+  fluidPage(
     navbarPage("Text Analysis",
       tabPanel("App"),
       tabPanel("Guide"),

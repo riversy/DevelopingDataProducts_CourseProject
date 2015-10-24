@@ -9,7 +9,7 @@ library(memoise)
 # The list of valid books
 books <<- list(
   "Sense and Sensibility" = "austen",
-  "Moby Dick; or The Whale" = "melville"  
+  "Moby Dick; or The Whale" = "melville"
 )
 
 ###
@@ -108,14 +108,14 @@ getPerChapterDataFrame <- memoise(function(book, qty){
   wordV <- c()
   countV <- c()
 
-  for (i in 1:length(chapters)){
+  for (j in 1:length(words)) {
 
-    chapter <- chapters[i]
-    chapterMatrix <- getTermMatrix(chapter)
+    word <- words[j]
 
-    for (j in 1:length(words)) {
+    for (i in 1:length(chapters)){
 
-      word <- words[j]
+      chapter <- chapters[i]
+      chapterMatrix <- getTermMatrix(chapter)
 
       chapterV <- c(chapterV, i)
       wordV <- c(wordV, word)
@@ -124,7 +124,6 @@ getPerChapterDataFrame <- memoise(function(book, qty){
 
         countV <- c(countV, chapterMatrix[[word]])
 
-
       } else {
 
         countV <- c(countV, 0)
@@ -132,11 +131,12 @@ getPerChapterDataFrame <- memoise(function(book, qty){
     }
   }
 
+
   # Build data frame
   # with data
   df <- data.frame(chapter = chapterV, word = wordV, count = countV)
   df$chapter <- as.factor(df$chapter)
-  df$word <- as.factor(df$word)
+  df$word <- factor(df$word, levels = words)
   df$count <- as.numeric(df$count)
 
   df

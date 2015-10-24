@@ -17,12 +17,25 @@ shinyUI(
               "qty",
               "Quantity of top words:",
               min = 1,
-              max = 100,
-              value = 30
+              max = 15,
+              value = 10
             )
           ),
           mainPanel(
-            plotOutput("wordcloud")
+            tabsetPanel(
+              tabPanel(
+                "Words Cloud",
+                plotOutput(
+                  "wordcloud"
+                )
+              ),
+              tabPanel(
+                "Per Chart Usage",
+                plotOutput(
+                  "usage"
+                )
+              )
+            )
           )
         )
       ),

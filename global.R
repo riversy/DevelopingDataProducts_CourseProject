@@ -4,11 +4,12 @@
 
 library(tm)
 library(wordcloud)
+library(memoise)
 
 # The list of valid books
 books <<- list(
-  "Moby Dick; or The Whale" = "melville",
-  "Sense and Sensibility" = "austen"
+  "Sense and Sensibility" = "austen",
+  "Moby Dick; or The Whale" = "melville"  
 )
 
 ###
@@ -24,7 +25,7 @@ validateBook <- function (book){
 ###
 # Extract book lines
 ###
-getBookLines <- function(book){
+getBookLines <- memoise(function(book){
   # Validate book
   validateBook(book)
 
@@ -42,44 +43,125 @@ getBookLines <- function(book){
   # with book's lines
   # only
   text.v[chapter.1.position:the.end.position]
-}
+})
 
 ###
 # Get whole text of a book
 ###
-getBookText <- function(book){
+getBookText <- memoise(function(book){
   book.lines <- getBookLines(book)
   paste(book.lines, collapse = " ")
+})
+
+###
+# Get the list of chapters
+###
+getBookChapters <- function(book){
+
+  # Create empty
+  # vector for
+  # chapters
+  chapters <- c()
+
+  book.lines <- getBookLines(book)
+  book.lines.qty <- length(book.lines)
+
+  chapter.positions <- grep("^CHAPTER \\d", book.lines)
+  chapter.qty <- length(chapter.positions)
+
+  for (i in 1:(chapter.qty - 1)){
+
+      chapter.lines <- book.lines[chapter.positions[i]:chapter.positions[i + 1]]
+      chapter <- paste(chapter.lines, collapse = " ")
+      chapters <- c(chapters, chapter)
+  }
+
+  # Add last chapter
+  chapter.lines <- book.lines[chapter.positions[chapter.qty]:book.lines.qty]
+  chapter <- paste(chapter.lines, collapse = " ")
+  chapters <- c(chapters, chapter)
+
+  # Return
+  # chapters
+  chapters
 }
 
-getTermMatrixPerBook <- function(book, qty){
+getTermMatrixPerBook <- memoise(function(book, qty){
   text <- getBookText(book)
-  getTermMatrix(text, qty)
-}
+  matrix <- getTermMatrix(text)
+  matrix[1:qty]
+})
 
-getTermMatrixPerChapter <- function(book){
-  
-}
+getPerChapterDataFrame <- memoise(function(book, qty){
+
+  # Find words we should use
+  text <- getBookText(book)
+  matrix <- getTermMatrix(text)
+  matrix <- matrix[1:qty]
+  words <- names(matrix)
+
+  # Get chapters
+  chapters <- getBookChapters(book)
+
+  # Collect data
+  chapterV <- c()
+  wordV <- c()
+  countV <- c()
+
+  for (i in 1:length(chapters)){
+
+    chapter <- chapters[i]
+    chapterMatrix <- getTermMatrix(chapter)
+
+    for (j in 1:length(words)) {
+
+      word <- words[j]
+
+      chapterV <- c(chapterV, i)
+      wordV <- c(wordV, word)
+
+      if (word %in% names(chapterMatrix)){
+
+        countV <- c(countV, chapterMatrix[[word]])
+
+
+      } else {
+
+        countV <- c(countV, 0)
+      }
+    }
+  }
+
+  # Build data frame
+  # with data
+  df <- data.frame(chapter = chapterV, word = wordV, count = countV)
+  df$chapter <- as.factor(df$chapter)
+  df$word <- as.factor(df$word)
+  df$count <- as.numeric(df$count)
+
+  df
+})
 
 ###
 # Get term Matrix for piece of text
 ###
-getTermMatrix <- function(text, qty) {
+getTermMatrix <- memoise(function(text) {
 
+  # Prepare corpus of words
   corpus = Corpus(VectorSource(text))
   corpus = tm_map(corpus, content_transformer(tolower))
   corpus = tm_map(corpus, removePunctuation)
   corpus = tm_map(corpus, removeNumbers)
   corpus = tm_map(corpus, removeWords, stopwords("english"))
 
+  # Build terms matrix
   myDTM =
     TermDocumentMatrix(
       corpus,
       control = list(minWordLength = 1)
     )
+  matrix = as.matrix(myDTM)
 
-  m = as.matrix(myDTM)
-
-  sorted <- sort(rowSums(m), decreasing = TRUE)
-  sorted[1:qty]
-}
+  # Sort the matrix
+  sort(rowSums(matrix), decreasing = TRUE)
+})

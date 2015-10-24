@@ -1,4 +1,5 @@
 library(shiny)
+library(ggplot2)
 
 shinyServer(
   function(input, output) {
@@ -28,6 +29,25 @@ shinyServer(
           "Dark2"
         )
       )
+    })
+
+    perChapterDataFrame <- reactive({
+      getPerChapterDataFrame(input$book, input$qty)
+    })
+
+    output$usage <- renderPlot({
+      df <- perChapterDataFrame()
+
+      ggplot(
+        df,
+        aes(
+          x=chapter,
+          y=count,
+          fill=word)
+        ) +
+        geom_bar(stat="identity")  +
+        facet_wrap( ~ word, ncol = 2) +
+        theme(axis.text.x=element_blank())
     })
   }
 )

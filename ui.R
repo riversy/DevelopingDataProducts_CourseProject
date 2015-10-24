@@ -1,31 +1,46 @@
 library(shiny)
 
 shinyUI(
-  
   fluidPage(
     navbarPage("Text Analysis",
-
       tabPanel(
-        "App", 
+        "App",
         sidebarLayout(
           sidebarPanel(
-            radioButtons("plotType", "Plot type",
-                         c("Scatter"="p", "Line"="l")
+            selectInput(
+              "book",
+              "Choose a book for analysis:",
+              choices = books
+            ),
+            hr(),
+            sliderInput(
+              "freq",
+              "Minimum Frequency:",
+              min = 1,
+              max = 50,
+              value = 15
+            ),
+            sliderInput(
+              "max",
+              "Maximum Number of Words:",
+              min = 1,
+              max = 300,
+              value = 100
             )
           ),
           mainPanel(
-            plotOutput("plot")
+            plotOutput("wordcloud")
           )
-        )         
+        )
       ),
       tabPanel(
-        "Guide", 
+        "Guide",
         fluidRow(
-          column(12, 
+          column(12,
             includeMarkdown("guide.md")
           )
         )
       )
     )
-  ) 
+  )
 )

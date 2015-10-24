@@ -1,4 +1,4 @@
-# Course Project on Coursera Machine Learning
+# Course Project on Developing Data Products
 There's my Course Project on Developing Data Products course on [Coursera][1].
 
 It consist of two parts. First part is **Shiny** app. And the second one is the **Slidify** presentation.

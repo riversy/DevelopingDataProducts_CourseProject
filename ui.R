@@ -17,8 +17,8 @@ shinyUI(
               "qty",
               "Quantity of top words:",
               min = 1,
-              max = 15,
-              value = 10
+              max = 150,
+              value = 25
             )
           ),
           mainPanel(

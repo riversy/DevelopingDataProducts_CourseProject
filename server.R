@@ -3,6 +3,9 @@ library(ggplot2)
 
 shinyServer(
   function(input, output) {
+    ###
+    # Prepare "Words Cloud" plot
+    ###
 
     # Define a reactive
     # expression for the
@@ -31,11 +34,27 @@ shinyServer(
       )
     })
 
+    ###
+    # Prepare "Per Chapter Usage" plot
+    ###
+
     perChapterDataFrame <- reactive({
       getPerChapterDataFrame(input$book, input$qty)
     })
 
+    getColCount <- reactive({
+      min( c(ceiling(input$qty / 10), 3) )
+    })
+
+    height <- reactive({
+      colCount <- getColCount()
+      round(input$qty / colCount * 100)
+    })
+
     output$usage <- renderPlot({
+
+      colCount <- getColCount()
+
       df <- perChapterDataFrame()
 
       ggplot(
@@ -46,8 +65,11 @@ shinyServer(
           fill=word)
         ) +
         geom_bar(stat="identity")  +
-        facet_wrap( ~ word, ncol = 2) +
-        theme(axis.text.x=element_blank())
-    })
+        facet_wrap( ~ word, ncol = colCount) +
+        theme(
+          axis.text.x=element_blank(),
+          legend.position="none"
+        )
+    }, height = height)
   }
 )

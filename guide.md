@@ -11,4 +11,4 @@ So, this app allows to make brief analysis of the three literature works.
 ### Settings sidebar
 ### Plot tabs
 #### Word Cloud
-#### Bar plot
+#### Per chapter usage

@@ -30,7 +30,7 @@ shinyUI(
                 )
               ),
               tabPanel(
-                "Per Chart Usage",
+                "Per Chapter Usage",
                 plotOutput(
                   "usage"
                 )

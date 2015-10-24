@@ -7,7 +7,7 @@ shinyServer(
     # expression for the
     # document term matrix
     bookTerms <- reactive({
-      getTermMatrixPerBook(input$book)
+      getTermMatrixPerBook(input$book, input$qty)
     })
 
     # Make the wordcloud
@@ -21,8 +21,8 @@ shinyServer(
         names(v),
         v,
         scale=c(4, 0.5),
-        min.freq = input$freq,
-        max.words=input$max,
+        min.freq = 1,
+        max.words=input$qty,
         colors=brewer.pal(
           8,
           "Dark2"

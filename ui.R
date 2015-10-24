@@ -14,18 +14,11 @@ shinyUI(
             ),
             hr(),
             sliderInput(
-              "freq",
-              "Minimum Frequency:",
+              "qty",
+              "Quantity of top words:",
               min = 1,
-              max = 50,
-              value = 15
-            ),
-            sliderInput(
-              "max",
-              "Maximum Number of Words:",
-              min = 1,
-              max = 300,
-              value = 100
+              max = 100,
+              value = 30
             )
           ),
           mainPanel(

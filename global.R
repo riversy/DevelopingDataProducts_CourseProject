@@ -52,9 +52,9 @@ getBookText <- function(book){
   paste(book.lines, collapse = " ")
 }
 
-getTermMatrixPerBook <- function(book){
+getTermMatrixPerBook <- function(book, qty){
   text <- getBookText(book)
-  getTermMatrix(text)
+  getTermMatrix(text, qty)
 }
 
 getTermMatrixPerChapter <- function(book){
@@ -62,9 +62,9 @@ getTermMatrixPerChapter <- function(book){
 }
 
 ###
-#
+# Get term Matrix for piece of text
 ###
-getTermMatrix <- function(text) {
+getTermMatrix <- function(text, qty) {
 
   corpus = Corpus(VectorSource(text))
   corpus = tm_map(corpus, content_transformer(tolower))
@@ -80,5 +80,6 @@ getTermMatrix <- function(text) {
 
   m = as.matrix(myDTM)
 
-  sort(rowSums(m), decreasing = TRUE)
+  sorted <- sort(rowSums(m), decreasing = TRUE)
+  sorted[1:qty]
 }

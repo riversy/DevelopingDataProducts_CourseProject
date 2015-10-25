@@ -13,7 +13,7 @@ knit        : slidify::knit2slides
 
 ## The idea
 
-The app is based on the work of **Fereshteh Karimeddini** [Words Cloud][1]. In the other hand it was also inspired by the book of **Matthew L. Jockers** [Text Analysis with R for Students of Literature][2] about how to use data analysis in the literature science.
+The app is based on the work of **Fereshteh Karimeddini** [Words Cloud][1]. In the other hand it was also inspired by the book of **Matthew L. Jockers** [Text Analysis with R for Students of Literature][2] about how to use data analysis in the literature science. My idea was to combine few methods of visualization of text data together and test it on sample books.
 
 This app allows to make brief analysis of two literature works:
 - Sense and Sensibility *by Jane Austen*;
@@ -26,25 +26,255 @@ User may choose the book for analysis and select the quantity of top used words 
   [2]: https://www.springer.com/us/book/9783319031637#aboutBook "Text Analysis with R for Students of Literature"
 
 
---- .class #id
-
+---
 ## The app
 
+![](assets/img/animation.gif)
 
---- .class #id
+It available by link - [https://goo.gl/5l8HKi][1].
+
+  [1]: https://goo.gl/5l8HKi "Text Analysis App"
+
+---
+
+## Words Cloud Code
+
+The link to code that builds matrix is placed here - [https://goo.gl/seRxQp](https://goo.gl/seRxQp)
+
+```{r, echo=FALSE}
+library(tm)
+library(wordcloud)
+library(NLP)
+library(RColorBrewer)
+
+###
+# Extract book lines
+###
+getBookLines <- function(book){
+  # Validate book
+  validateBook(book)
+
+  # Build filename
+  fileName <- paste(c("../data/", book, ".txt"), collapse = "")
+
+  # Read book from file
+  text.v <- scan(fileName, what="character", sep="\n")
+
+  # Define first and last lines
+  chapter.1.position <- grep("^CHAPTER 1", text.v)
+  the.end.position <- grep("^THE END", text.v)
+
+  # Cut subsequence
+  # with book's lines
+  # only
+  text.v[chapter.1.position[1]:the.end.position]
+}
+
+###
+# Get term Matrix for piece of text
+###
+getTermMatrix <- function(text) {
+
+  # Prepare corpus of words
+  corpus = Corpus(VectorSource(text))
+  corpus = tm_map(corpus, content_transformer(tolower))
+  corpus = tm_map(corpus, removePunctuation)
+  corpus = tm_map(corpus, removeNumbers)
+  corpus = tm_map(corpus, removeWords, stopwords("english"))
+
+  # Build terms matrix
+  myDTM =
+    TermDocumentMatrix(
+      corpus,
+      control = list(minWordLength = 1)
+    )
+  matrix = as.matrix(myDTM)
+
+  # Sort the matrix
+  sort(rowSums(matrix), decreasing = TRUE)
+}
+
+getTermMatrixPerBook <- function(book, qty){
+  text <- getBookText(book)
+  matrix <- getTermMatrix(text)
+  matrix[1:qty]
+}
+
+```
+
+```{r, results='hide'}
+bookTerms <- getTermMatrixPerBook('austen', 50)
+wordcloud(
+  names(bookTerms),
+  bookTerms,
+  scale=c(4, 0.5),
+  min.freq = 1,
+  max.words=50,
+  colors=brewer.pal(
+    8,
+    "Dark2"
+  )
+)
+
+```
+
+---
+
+## Words Cloud Plot
+
+```{r, echo = FALSE}
+bookTerms <- getTermMatrixPerBook('austen', 50)
+wordcloud(
+  names(bookTerms),
+  bookTerms,
+  scale=c(4, 0.5),
+  min.freq = 1,
+  max.words=50,
+  colors=brewer.pal(
+    8,
+    "Dark2"
+  )
+)
+
+```
+
+---
+
+## Per Chapter Usage Code
+
+The link to the code that used to prepare data for Per Chapter Usage is also here - [https://goo.gl/seRxQp](https://goo.gl/seRxQp)
+
+```{r, echo = FALSE}
+###
+# Get the list of chapters
+###
+getBookChapters <- function(book){
+
+  # Create empty
+  # vector for
+  # chapters
+  chapters <- c()
+
+  book.lines <- getBookLines(book)
+  book.lines.qty <- length(book.lines)
+
+  chapter.positions <- grep("^CHAPTER \\d", book.lines)
+  chapter.qty <- length(chapter.positions)
+
+  for (i in 1:(chapter.qty - 1)){
+
+      chapter.lines <- book.lines[chapter.positions[i]:chapter.positions[i + 1]]
+      chapter <- paste(chapter.lines, collapse = " ")
+      chapters <- c(chapters, chapter)
+  }
+
+  # Add last chapter
+  chapter.lines <- book.lines[chapter.positions[chapter.qty]:book.lines.qty]
+  chapter <- paste(chapter.lines, collapse = " ")
+  chapters <- c(chapters, chapter)
+
+  # Return
+  # chapters
+  chapters
+}
+
+getPerChapterDataFrame <- function(book, qty){
+
+  # Find words we should use
+  text <- getBookText(book)
+  matrix <- getTermMatrix(text)
+  matrix <- matrix[1:qty]
+  words <- names(matrix)
+
+  # Get chapters
+  chapters <- getBookChapters(book)
+
+  # Collect data
+  chapterV <- c()
+  wordV <- c()
+  countV <- c()
+
+  for (j in 1:length(words)) {
+
+    word <- words[j]
+
+    for (i in 1:length(chapters)){
+
+      chapter <- chapters[i]
+      chapterMatrix <- getTermMatrix(chapter)
+
+      chapterV <- c(chapterV, i)
+      wordV <- c(wordV, word)
+
+      if (word %in% names(chapterMatrix)){
+
+        countV <- c(countV, chapterMatrix[[word]])
+
+      } else {
+
+        countV <- c(countV, 0)
+      }
+    }
+  }
 
 
-## What's behind
+  # Build data frame
+  # with data
+  df <- data.frame(chapter = chapterV, word = wordV, count = countV)
+  df$chapter <- as.factor(df$chapter)
+  df$word <- factor(df$word, levels = words)
+  df$count <- as.numeric(df$count)
 
+  df
+}
 
---- .class #id
+```
 
-## Resulting plots
+```{r, results = 'hide'}
+df <- getPerChapterDataFrame('austen', 20)
+ggplot(
+  df,
+  aes(
+    x=chapter,
+    y=count,
+    fill=word)
+  ) +
+  geom_bar(stat="identity")  +
+  facet_wrap( ~ word, ncol = 3) +
+  theme(
+    axis.text.x=element_blank(),
+    legend.position="none"
+  )
+```
 
+---
 
---- .class #id
+## Per Chapter Usage Plot
+
+```{r, echo = FALSE}
+df <- getPerChapterDataFrame('austen', 20)
+ggplot(
+  df,
+  aes(
+    x=chapter,
+    y=count,
+    fill=word)
+  ) +
+  geom_bar(stat="identity")  +
+  facet_wrap( ~ word, ncol = 3) +
+  theme(
+    axis.text.x=element_blank(),
+    legend.position="none"
+  )
+```
+
+---
 
 ## Conclusion
 
+The app may tested here - [https://goo.gl/5l8HKi](https://goo.gl/5l8HKi).
 
---- .class #id
+You may enhance the code if you found it useful.
+Just fork it here - [https://goo.gl/q7CplV](https://goo.gl/q7CplV).
+
+Thank you.

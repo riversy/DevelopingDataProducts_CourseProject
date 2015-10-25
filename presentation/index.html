@@ -47,7 +47,7 @@
     <h2>The idea</h2>
   </hgroup>
   <article data-timings="">
-    <p>The app is based on the work of <strong>Fereshteh Karimeddini</strong> <a href="http://shiny.rstudio.com/gallery/word-cloud.html" title="Words Cloud">Words Cloud</a>. In the other hand it was also inspired by the book of <strong>Matthew L. Jockers</strong> <a href="https://www.springer.com/us/book/9783319031637#aboutBook" title="Text Analysis with R for Students of Literature">Text Analysis with R for Students of Literature</a> about how to use data analysis in the literature science.</p>
+    <p>The app is based on the work of <strong>Fereshteh Karimeddini</strong> <a href="http://shiny.rstudio.com/gallery/word-cloud.html" title="Words Cloud">Words Cloud</a>. In the other hand it was also inspired by the book of <strong>Matthew L. Jockers</strong> <a href="https://www.springer.com/us/book/9783319031637#aboutBook" title="Text Analysis with R for Students of Literature">Text Analysis with R for Students of Literature</a> about how to use data analysis in the literature science. My idea was to combine few methods of visualization of text data together and test it on sample books.</p>
 
 <p>This app allows to make brief analysis of two literature works:</p>
 
@@ -62,49 +62,109 @@
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="class" id="id" style="background:;">
+<slide class="" id="slide-2" style="background:;">
   <hgroup>
     <h2>The app</h2>
   </hgroup>
   <article data-timings="">
-    
+    <p><img src="assets/img/animation.gif" alt=""></p>
+
+<p>It available by link - <a href="https://goo.gl/5l8HKi" title="Text Analysis App">https://goo.gl/5l8HKi</a>.</p>
+
   </article>
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="class" id="id" style="background:;">
+<slide class="" id="slide-3" style="background:;">
   <hgroup>
-    <h2>What&#39;s behind</h2>
+    <h2>Words Cloud Code</h2>
   </hgroup>
   <article data-timings="">
-    
+    <p>The link to code that builds matrix is placed here - <a href="https://goo.gl/seRxQp">https://goo.gl/seRxQp</a></p>
+
+<pre><code class="r">bookTerms &lt;- getTermMatrixPerBook(&#39;austen&#39;, 50)
+wordcloud(
+  names(bookTerms),
+  bookTerms,
+  scale=c(4, 0.5),
+  min.freq = 1,
+  max.words=50,
+  colors=brewer.pal(
+    8,
+    &quot;Dark2&quot;
+  )
+)
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-2-1.png" alt="plot of chunk unnamed-chunk-2"> </p>
+
   </article>
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="class" id="id" style="background:;">
+<slide class="" id="slide-4" style="background:;">
   <hgroup>
-    <h2>Resulting plots</h2>
+    <h2>Words Cloud Plot</h2>
   </hgroup>
   <article data-timings="">
-    
+    <p><img src="assets/fig/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"> </p>
+
   </article>
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="class" id="id" style="background:;">
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h2>Per Chapter Usage Code</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The link to the code that used to prepare data for Per Chapter Usage is also here - <a href="https://goo.gl/seRxQp">https://goo.gl/seRxQp</a></p>
+
+<pre><code class="r">df &lt;- getPerChapterDataFrame(&#39;austen&#39;, 20)
+ggplot(
+  df,
+  aes(
+    x=chapter,
+    y=count,
+    fill=word)
+  ) +
+  geom_bar(stat=&quot;identity&quot;)  +
+  facet_wrap( ~ word, ncol = 3) +
+  theme(
+    axis.text.x=element_blank(),
+    legend.position=&quot;none&quot;
+  )
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-6" style="background:;">
+  <hgroup>
+    <h2>Per Chapter Usage Plot</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-6-1.png" alt="plot of chunk unnamed-chunk-6"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-7" style="background:;">
   <hgroup>
     <h2>Conclusion</h2>
   </hgroup>
   <article data-timings="">
-    
-  </article>
-  <!-- Presenter Notes -->
-</slide>
+    <p>The app may tested here - <a href="https://goo.gl/5l8HKi">https://goo.gl/5l8HKi</a>.</p>
 
-<slide class="class" id="id" style="background:;">
-  <article data-timings="">
-    
+<p>You may enhance the code if you found it useful.
+Just fork it here - <a href="https://goo.gl/q7CplV">https://goo.gl/q7CplV</a>.</p>
+
+<p>Thank you.</p>
+
   </article>
   <!-- Presenter Notes -->
 </slide>
@@ -127,26 +187,32 @@
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=3 title='What&#39;s behind'>
+        data-slide=3 title='Words Cloud Code'>
          3
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=4 title='Resulting plots'>
+        data-slide=4 title='Words Cloud Plot'>
          4
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=5 title='Conclusion'>
+        data-slide=5 title='Per Chapter Usage Code'>
          5
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=6 title='NA'>
+        data-slide=6 title='Per Chapter Usage Plot'>
          6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='Conclusion'>
+         7
       </a>
     </li>
   </ul>

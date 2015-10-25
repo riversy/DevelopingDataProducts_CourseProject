@@ -27,9 +27,14 @@ setwd("<directory with the repo>")
 
 After that you may use command ``runApp()`` to start this Shiny application.
 
+## presentation
+
+The presentation for this project is placed [here][3]. 
+
 ## Support
 
 There's no support here but please feel free to issue questions [here][2].
 
   [1]: https://class.coursera.org/devdataprod-033 "Developing Data Products"
   [2]: https://github.com/riversy/DevelopingDataProducts_CourseProject/issues/new "Submit new issue"
+  [3]: http://riversy.github.io/DevelopingDataProducts_CourseProject/presentation/index.html "Presentation"

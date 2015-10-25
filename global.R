@@ -5,6 +5,7 @@
 library(tm)
 library(wordcloud)
 library(memoise)
+library(markdown)
 
 # The list of valid books
 books <<- list(
